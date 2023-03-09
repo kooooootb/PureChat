@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chat page</title>
+</head>
+<body>
+
+    <div id="wrapper">
+        <label for="message input">Your message:</label><input oninput="handleInput()" type="text" id="message input" name="message">
+        <button onclick="addMessage()">send</button>
+
+        <div id="messages">
+            <ul></ul>
+        </div>
+
+        <button onclick="updateMessages()">update</button>
+
+    </div>
+
+    <script>
+        let currentMessage = "";
+        handleInput();
+        updateMessages();
+
+        async function updateMessages(){
+            return setMessages(await fetch("/api"));
+        }
+
+        async function setMessages(response){
+            const doc = document.getElementById('messages');
+            if(response.ok){
+                let html = "<ul>"
+                let list = await response.json();
+                list.map(element => {
+                    html += "<li>";
+                    html += element[0];
+                    html += "</li>";
+                });
+                html += "</ul>";
+                doc.innerHTML = html;
+            } else{
+                console.log(response.status);
+            }
+        }
+
+        function handleInput(){
+            currentMessage = document.getElementById("message input").value;
+        }
+
+        async function addMessage(){
+            return setMessages(await fetch("/api", {
+                method: 'POST',
+                headers:{
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({message: currentMessage}),
+            }))
+        }
+    </script>
+
+</body>
+</html>

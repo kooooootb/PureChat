@@ -1,0 +1,22 @@
+version: "3.9"
+services:
+  postgres:
+    image: postgres:13.3
+    container_name: postgres
+    environment:
+      POSTGRES_DB: "chatdb"
+      POSTGRES_USER: "kotb"
+      POSTGRES_PASSWORD: "super_password"
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - .:/var/lib/postgresql/data
+#    ports:
+#      - "5430:5432"
+  chat:
+    image: kotb/purechat
+    container_name: chat
+    depends_on:
+      - postgres
+    ports:
+      - "3000:3000"
